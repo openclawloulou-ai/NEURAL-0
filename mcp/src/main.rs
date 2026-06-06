@@ -113,7 +113,7 @@ fn hex_encode(bytes: &[u8]) -> String {
 
 fn hex_decode(s: &str) -> Result<Vec<u8>, String> {
     let s = s.trim().trim_start_matches("0x");
-    if s.len() % 2 != 0 {
+    if !s.len().is_multiple_of(2) {
         return Err("hex string must have an even number of characters".to_string());
     }
     let mut out = Vec::with_capacity(s.len() / 2);
