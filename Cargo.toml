@@ -2,5 +2,6 @@
 members = [
     "assembler",
     "kernel",
+    "mcp",
 ]
 resolver = "2"

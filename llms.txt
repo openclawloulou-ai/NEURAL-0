@@ -1,0 +1,42 @@
+# NEURAL-0
+
+> Stack-based 16-bit-opcode virtual machine and bytecode language optimised for LLM generation and autonomous AI agents. Capability-gated, snapshot-pausable, Wasm-targetable. Phase 1 (Rust kernel + assembler) is partial but working.
+
+## Spec
+
+- [Instruction Set Architecture](spec/ISA.md): 16-bit opcode map, operand encoding, trap conditions
+- [Binary Format](spec/BINARY_FORMAT.md): `.n0b` module layout, `.n0dag` manifest, endianness
+- [Assembly Format](spec/ASSEMBLY.md): `.n0asm` text grammar, directives, examples
+- [Capability Model](spec/CAPABILITIES.md): token structure, TOOL_X enforcement, default policy
+- [Snapshot Engine](spec/SNAPSHOT.md): `.n0snap` format, CRC32, restore semantics
+
+## Plan and contracts
+
+- [Roadmap](PLAN.md): phased deliverables, fitness function, safety gates on Phase 4 auto-merge
+- [Contributing](CONTRIBUTING.md): workflow contract for AI-agent contributors
+- [Agents](AGENTS.md): onboarding contract for AI agents picking up the repo
+- [Readme](README.md): human-facing entry point
+
+## Code
+
+- [Kernel](kernel/src/lib.rs): VM crate, exports `VM`, `Trap`, `module::extract_code`
+- [Assembler](assembler/src/lib.rs): `.n0asm` → `.n0b` crate; `SimpleAssembler` is the working subset
+- [MCP Server](mcp/src/main.rs): stdio MCP server exposing `assemble` and `run` tools to any MCP-compatible agent
+
+## Examples
+
+- [Hello, arithmetic](tests/programs/hello_arithmetic.n0asm): push 2, push 3, add, halt. End-to-end working.
+- [Conditional](tests/programs/conditional.n0asm): acceptance target, blocked on full assembler
+- [Snapshot/resume](tests/programs/snapshot_resume.n0asm): acceptance target, blocked on full assembler
+
+## Build and run
+
+```
+cargo check --workspace
+cargo run -p neural0_kernel -- asm tests/programs/hello_arithmetic.n0asm -o /tmp/hello.n0b
+cargo run -p neural0_kernel -- run /tmp/hello.n0b
+```
+
+## License
+
+MIT. See [LICENSE](LICENSE).

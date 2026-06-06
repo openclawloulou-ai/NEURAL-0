@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::io::{self, Write};
 use neural0_assembler::SimpleAssembler;
+use neural0_kernel::module::extract_code;
 use neural0_kernel::{VM, Trap};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -26,7 +27,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             
             let input_file = &args[2];
             let binary = fs::read(input_file)?;
-            let code = module_code_section(&binary)
+            let code = extract_code(&binary)
                 .map_err(|e| format!("Invalid NEURAL-0 module: {}", e))?;
             
             let mut vm = VM::new(1024, 65536); // 1KB stack, 64KB memory
@@ -145,74 +146,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     
-    Ok(())
-}
-
-fn module_code_section(binary: &[u8]) -> Result<&[u8], String> {
-    let magic = 0x4E30u16.to_be_bytes();
-    if binary.len() < 2 || binary[0..2] != magic {
-        return Ok(binary);
-    }
-
-    if binary.len() < 14 {
-        return Err("module header is truncated".to_string());
-    }
-
-    let version = u16::from_be_bytes([binary[2], binary[3]]);
-    if version != 0x0001 {
-        return Err(format!("unsupported module version {:#06x}", version));
-    }
-
-    let flags = u16::from_be_bytes([binary[8], binary[9]]);
-    let mut offset = 10usize;
-
-    if flags & 0x0001 != 0 {
-        let input_count = read_u8(binary, &mut offset)? as usize;
-        advance(binary, &mut offset, input_count)?;
-        let output_count = read_u8(binary, &mut offset)? as usize;
-        advance(binary, &mut offset, output_count)?;
-    }
-
-    let code_len = read_u32_be(binary, &mut offset)? as usize;
-    let code_start = offset;
-    advance(binary, &mut offset, code_len)?;
-
-    let data_len = read_u32_be(binary, &mut offset)? as usize;
-    advance(binary, &mut offset, data_len)?;
-
-    Ok(&binary[code_start..code_start + code_len])
-}
-
-fn read_u8(binary: &[u8], offset: &mut usize) -> Result<u8, String> {
-    if *offset >= binary.len() {
-        return Err("unexpected end of module".to_string());
-    }
-    let value = binary[*offset];
-    *offset += 1;
-    Ok(value)
-}
-
-fn read_u32_be(binary: &[u8], offset: &mut usize) -> Result<u32, String> {
-    if *offset + 4 > binary.len() {
-        return Err("unexpected end of module".to_string());
-    }
-    let value = u32::from_be_bytes([
-        binary[*offset],
-        binary[*offset + 1],
-        binary[*offset + 2],
-        binary[*offset + 3],
-    ]);
-    *offset += 4;
-    Ok(value)
-}
-
-fn advance(binary: &[u8], offset: &mut usize, len: usize) -> Result<(), String> {
-    let next = offset
-        .checked_add(len)
-        .ok_or_else(|| "module offset overflow".to_string())?;
-    if next > binary.len() {
-        return Err("unexpected end of module".to_string());
-    }
-    *offset = next;
     Ok(())
 }

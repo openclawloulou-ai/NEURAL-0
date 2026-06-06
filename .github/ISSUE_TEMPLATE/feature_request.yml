@@ -1,0 +1,57 @@
+name: Feature request
+description: Propose a new opcode, directive, capability kind, MCP tool, or spec change.
+title: "[Feature]: "
+labels: ["enhancement", "needs-design-review"]
+body:
+  - type: markdown
+    attributes:
+      content: |
+        Feature requests that touch spec/ require a maintainer sign-off.
+        See CONTRIBUTING.md §4 for what you can land without one.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New opcode
+        - New assembler directive
+        - New capability kind
+        - New MCP tool
+        - Kernel / VM behaviour
+        - Spec/ normative change
+        - Documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this solve? Which use case from PLAN.md does it advance?
+      validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Concrete change. For spec changes, paste a diff against spec/X.md.
+      validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Why this shape and not something else?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I have read PLAN.md and the relevant spec/X.md
+          required: true
+        - label: For spec changes, I have included a migration note
+        - label: I have considered how this interacts with the capability model

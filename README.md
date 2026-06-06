@@ -40,7 +40,9 @@ mid-rewrite.
 .
 ├── PLAN.md          # Authoritative roadmap, phases, fitness function (READ THIS)
 ├── CONTRIBUTING.md  # Your workflow contract — read this before committing
-├── Cargo.toml       # Workspace manifest for kernel + assembler
+├── AGENTS.md        # Onboarding contract for AI agents picking up the repo
+├── llms.txt         # LLM-oriented summary of the repo, per llmstxt.org
+├── Cargo.toml       # Workspace manifest (kernel + assembler + mcp)
 ├── LICENSE          # MIT
 │
 ├── spec/            # Normative specifications (do not contradict these)
@@ -59,7 +61,11 @@ mid-rewrite.
 │       ├── vm.rs          # Fetch-decode-execute loop
 │       ├── trap.rs        # Trap codes
 │       ├── capability.rs  # Capability table + TOOL_X gate
+│       ├── module.rs      # Module header parsing (pub extract_code)
 │       └── snapshot.rs    # SNAP_S / SNAP_R binary format
+│
+├── mcp/             # MCP server crate (`n0-mcp` binary)
+│   └── src/main.rs        # stdio MCP server: `assemble` and `run` tools
 │
 ├── assembler/       # Rust `.n0asm` -> `.n0b` crate (`n0asm` binary)
 │   └── src/
@@ -96,6 +102,28 @@ cargo run -p neural0_kernel -- run /tmp/hello.n0b
 ```
 
 Expected behaviour: VM halts with `Final stack: [I64(5)]`.
+
+## Using NEURAL-0 from an MCP-compatible agent
+
+The `n0-mcp` binary is a stdio MCP server exposing the kernel and assembler as
+two tools — `assemble` and `run` — to any MCP client (Claude Desktop, Cursor,
+etc.). Register it in the client's MCP config:
+
+```json
+{
+  "mcpServers": {
+    "neural0": {
+      "command": "cargo",
+      "args": ["run", "-p", "neural0_mcp", "--release"]
+    }
+  }
+}
+```
+
+Once registered, an agent can call `assemble` to compile `.n0asm` source to
+hex-encoded `.n0b`, then call `run` to execute the module on a fresh VM and
+read the final stack. The MCP server is a sketch in v0.1 — only `PUSH_I64`,
+`ADD`, and `HALT` are reachable through the current assembler.
 
 ---
 

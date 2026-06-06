@@ -1,0 +1,60 @@
+name: Agent task
+description: An AI agent (or human) is claiming an item from the Phase 1 backlog in CONTRIBUTING.md §2.
+title: "[Agent]: "
+labels: ["agent", "phase-1", "help-wanted"]
+body:
+  - type: markdown
+    attributes:
+      content: |
+        Use this template when you intend to open a PR for a specific backlog item
+        from CONTRIBUTING.md §2. The maintainer will use this issue to track
+        progress and unblock you.
+
+  - type: dropdown
+    id: backlog_item
+    attributes:
+      label: Backlog item
+      description: Which item from CONTRIBUTING.md §2 are you tackling?
+      options:
+        - "1. Finish assembler/src/parser.rs + codegen.rs to spec parity"
+        - "2. Wire SNAP_S / SNAP_R end-to-end"
+        - "3. Wire TOOL_X against a real CapabilityHost"
+        - "4. Resolve the Agent-Semantic opcode concern"
+        - "5. Add cargo test integration tests for tests/programs/*.n0asm"
+        - "6. Remove pretty_assertions dev-dep (or use it in tests)"
+        - "Other (describe below)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: Implementation plan
+      description: Steps you will take, in order. Cite the spec sections you will modify.
+      validations:
+      required: true
+
+  - type: textarea
+    id: test
+    attributes:
+      label: How you will test it
+      description: Specific assertions your PR will pass.
+      validations:
+      required: true
+
+  - type: input
+    id: eta
+    attributes:
+      label: Estimated PR date
+      description: YYYY-MM-DD, rough. Maintainers are slow; over-promising is fine, missing by a month is not.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I have read AGENTS.md, CONTRIBUTING.md, and the relevant spec/
+          required: true
+        - label: My plan does not require maintainer sign-off per CONTRIBUTING.md §4
+          required: true
+        - label: I will open the PR as a draft until CI is green

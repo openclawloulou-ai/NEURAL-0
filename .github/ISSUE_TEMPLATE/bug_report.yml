@@ -1,0 +1,72 @@
+name: Bug report
+description: Report a defect in the kernel, assembler, MCP server, or a spec/ normative document.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      content: |
+        Thanks for filing a bug. Please fill out the sections below.
+        If this is a spec/ error, link the offending line; if it is a
+        kernel/assembler error, paste the smallest failing .n0asm program.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      description: Where did the bug show up?
+      options:
+        - kernel (VM execution)
+        - assembler
+        - MCP server (n0-mcp)
+        - spec/ normative document
+        - CI / tooling
+        - documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Smallest .n0asm program or shell transcript that triggers the bug.
+      placeholder: |
+        PUSH_I64 2
+        PUSH_I64 0
+        DIV
+        HALT
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened, per spec/?
+      validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: What actually happened, including any trap code or panic message.
+      validations:
+      required: true
+
+  - type: input
+    id: commit
+    attributes:
+      label: Commit SHA (if known)
+      description: Run `git rev-parse HEAD` in the working tree.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I have read CONTRIBUTING.md and AGENTS.md
+          required: true
+        - label: I have searched existing issues and confirmed this is not a duplicate
+          required: true
+        - label: The failing program is included in this report (not a screenshot)
