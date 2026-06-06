@@ -1,0 +1,14 @@
+; Test conditional branching
+; Compute 10 - 5, branch if result > 3
+PUSH_I64 10
+PUSH_I64 5
+SUB              ; Result = 5
+PUSH_I64 3
+LT               ; Is 5 < 3? (false, so 0)
+JUMP_IF zero_result
+PUSH_I64 1       ; Non-zero branch
+JUMP end
+zero_result:
+PUSH_I64 0       ; Zero branch
+end:
+HALT

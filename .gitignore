@@ -1,0 +1,27 @@
+# Rust
+target/
+**/*.rs.bk
+
+# Cargo lockfiles are committed for binary crates; uncomment if treating as a library
+# Cargo.lock
+
+# NEURAL-0 build artifacts
+*.n0b
+*.n0dag
+*.n0snap
+
+# Scratch / debug binaries left in the working tree
+debug_bytes
+*.pdb
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Agent runtime state (keep dirs, ignore contents)
+/.agents/work/
+/.codex/work/

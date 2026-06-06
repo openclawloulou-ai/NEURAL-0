@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "assembler",
+    "kernel",
+]
+resolver = "2"

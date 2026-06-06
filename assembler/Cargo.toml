@@ -1,0 +1,16 @@
+[package]
+name = "neural0_assembler"
+version = "0.1.0"
+edition = "2021"
+description = "NEURAL-0 Assembler - Converts .n0asm text to .n0b binary"
+license = "MIT"
+
+[[bin]]
+name = "n0asm"
+path = "src/main.rs"
+
+[dependencies]
+logos = "0.11"
+
+[dev-dependencies]
+pretty_assertions = "1.4"

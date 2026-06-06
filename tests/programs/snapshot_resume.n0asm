@@ -1,0 +1,10 @@
+; Test snapshot and resume functionality
+PUSH_I64 42
+; Take a snapshot
+SNAP_S
+; Modify the value
+PUSH_I64 24
+ADD
+; Result should be 66 (42 + 24)
+; In a real test, we'd restore the snapshot and verify it's still 42
+HALT

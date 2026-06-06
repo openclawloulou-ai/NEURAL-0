@@ -1,0 +1,17 @@
+[package]
+name = "neural0_kernel"
+version = "0.1.0"
+edition = "2021"
+description = "NEURAL-0 Virtual Machine - Stack-based WASM-compatible interpreter"
+license = "MIT"
+
+[[bin]]
+name = "n0"
+path = "src/main.rs"
+
+[dependencies]
+neural0_assembler = { path = "../assembler" }
+
+[dev-dependencies]
+# For testing
+pretty_assertions = "1.4"
