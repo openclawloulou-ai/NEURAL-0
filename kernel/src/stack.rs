@@ -1,5 +1,5 @@
-use crate::value::Value;
 use crate::trap::Trap;
+use crate::value::Value;
 
 /// Stack implementation with bounds checking
 #[derive(Debug, Clone, Default)]

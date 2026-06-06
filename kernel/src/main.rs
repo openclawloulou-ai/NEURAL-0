@@ -1,13 +1,13 @@
+use neural0_assembler::SimpleAssembler;
+use neural0_kernel::module::extract_code;
+use neural0_kernel::{Trap, VM};
 use std::env;
 use std::fs;
 use std::io::{self, Write};
-use neural0_assembler::SimpleAssembler;
-use neural0_kernel::module::extract_code;
-use neural0_kernel::{VM, Trap};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
-    
+
     if args.len() < 2 {
         eprintln!("Usage: n0 <command> <args>");
         eprintln!("Commands:");
@@ -15,21 +15,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("  asm <file.n0asm> - Assemble a NEURAL-0 assembly file");
         std::process::exit(1);
     }
-    
+
     let command = &args[1];
-    
+
     match command.as_str() {
         "run" => {
             if args.len() < 3 {
                 eprintln!("Usage: n0 run <file.n0b>");
                 std::process::exit(1);
             }
-            
+
             let input_file = &args[2];
             let binary = fs::read(input_file)?;
-            let code = extract_code(&binary)
-                .map_err(|e| format!("Invalid NEURAL-0 module: {}", e))?;
-            
+            let code =
+                extract_code(&binary).map_err(|e| format!("Invalid NEURAL-0 module: {}", e))?;
+
             let mut vm = VM::new(1024, 65536); // 1KB stack, 64KB memory
             match vm.load_and_run(code) {
                 Ok(()) => {
@@ -100,10 +100,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 eprintln!("Usage: n0 asm <file.n0asm> [-o <output.n0b>]");
                 std::process::exit(1);
             }
-            
+
             let input_file = &args[2];
             let mut output_file = None;
-            
+
             // Parse optional arguments
             let mut i = 3;
             while i < args.len() {
@@ -122,10 +122,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-            
+
             let source = fs::read_to_string(input_file)?;
-            let binary = SimpleAssembler::assemble(&source)
-                .map_err(|e| format!("Assembly error: {}", e))?;
+            let binary =
+                SimpleAssembler::assemble(&source).map_err(|e| format!("Assembly error: {}", e))?;
 
             let output = output_file.unwrap_or_else(|| {
                 let mut out = input_file.clone();
@@ -145,6 +145,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             std::process::exit(1);
         }
     }
-    
+
     Ok(())
 }

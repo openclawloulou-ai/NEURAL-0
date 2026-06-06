@@ -1,19 +1,19 @@
+use neural0_assembler::SimpleAssembler;
 use std::env;
 use std::fs;
 use std::io::{self, Write};
-use neural0_assembler::SimpleAssembler;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
-    
+
     if args.len() < 2 {
         eprintln!("Usage: n0asm <input.n0asm> [-o <output.n0b>]");
         std::process::exit(1);
     }
-    
+
     let input_file = &args[1];
     let mut output_file = None;
-    
+
     // Parse optional arguments
     let mut i = 2;
     while i < args.len() {
@@ -32,14 +32,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-    
+
     // Read input file
     let source = fs::read_to_string(input_file)?;
-    
+
     // Assemble
-    let binary = SimpleAssembler::assemble(&source)
-        .map_err(|e| format!("Assembly error: {}", e))?;
-    
+    let binary =
+        SimpleAssembler::assemble(&source).map_err(|e| format!("Assembly error: {}", e))?;
+
     // Write output
     let output = output_file.unwrap_or_else(|| {
         let mut out = input_file.clone();
@@ -49,9 +49,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         out.push_str(".n0b");
         out
     });
-    
+
     fs::write(&output, &binary)?;
     writeln!(io::stdout(), "Wrote {} bytes to {}", binary.len(), output)?;
-    
+
     Ok(())
 }

@@ -1,8 +1,8 @@
-use crate::value::Value;
-use crate::stack::Stack;
-use crate::memory::Memory;
 use crate::capability::CapabilityTable;
+use crate::memory::Memory;
+use crate::stack::Stack;
 use crate::trap::Trap;
+use crate::value::Value;
 
 /// Snapshot engine for saving and restoring VM state
 pub struct Snapshot;
@@ -16,7 +16,7 @@ impl Snapshot {
 
 #[derive(Debug, Clone, Default)]
 pub struct SnapshotData {
-    pub timestamp: u64,           // Unix nanoseconds
+    pub timestamp: u64, // Unix nanoseconds
     pub module_id: u32,
     pub program_counter: u32,
     pub stack: Vec<Value>,
@@ -58,7 +58,7 @@ impl Snapshot {
         // Note: For v1, we're simplifying the snapshot format significantly
         // due to privacy restrictions in CapabilityTable
         // A full implementation would serialize all the SnapshotData fields
-        
+
         // For now, we'll just return a minimal valid snapshot
         buffer
     }

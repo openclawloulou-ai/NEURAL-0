@@ -4,10 +4,7 @@ use neural0_assembler::SimpleAssembler;
 use neural0_kernel::module::extract_code;
 use neural0_kernel::VM;
 use rmcp::{
-    handler::server::{
-        router::tool::ToolRouter,
-        tool::Parameters,
-    },
+    handler::server::{router::tool::ToolRouter, tool::Parameters},
     model::*,
     schemars, tool, tool_handler, tool_router,
     transport::stdio,
@@ -50,8 +47,8 @@ impl N0McpServer {
         &self,
         Parameters(AssembleRequest { source }): Parameters<AssembleRequest>,
     ) -> Result<String, String> {
-        let bytes = SimpleAssembler::assemble(&source)
-            .map_err(|e| format!("assembly error: {}", e))?;
+        let bytes =
+            SimpleAssembler::assemble(&source).map_err(|e| format!("assembly error: {}", e))?;
         Ok(hex_encode(&bytes))
     }
 

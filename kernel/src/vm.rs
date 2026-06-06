@@ -1,9 +1,9 @@
+use crate::capability::CapabilityTable;
+use crate::memory::Memory;
 use crate::opcodes::*;
 use crate::stack::Stack;
-use crate::memory::Memory;
-use crate::value::Value;
 use crate::trap::Trap;
-use crate::capability::CapabilityTable;
+use crate::value::Value;
 
 /// The NEURAL-0 Virtual Machine
 pub struct VM {
@@ -38,7 +38,7 @@ impl VM {
         self.yield_requested = false;
         self.stack.clear();
         // Note: We don't clear memory here - preserving it allows for persistence between runs
-        
+
         self.execute_block(code)
     }
 
@@ -60,8 +60,7 @@ impl VM {
         let opcode_val = read_u16_be(code, &mut (self.pc as usize));
         self.pc += 2; // Move past opcode
 
-        let opcode = OpCode::from_u16(opcode_val)
-            .ok_or_else(|| Trap::InvalidOpcode)?;
+        let opcode = OpCode::from_u16(opcode_val).ok_or_else(|| Trap::InvalidOpcode)?;
 
         // Execute the opcode
         match opcode {

@@ -1,10 +1,9 @@
+use crate::trap::Trap;
 /// Module handling for DAG composition
 ///
 /// In v1, we keep this simple - a module is just a blob of code
 /// In v2+, this will handle imports, exports, and DAG execution
-
 use crate::vm::VM;
-use crate::trap::Trap;
 
 pub const MODULE_MAGIC: [u8; 2] = [0x4E, 0x30];
 pub const MODULE_VERSION: u16 = 0x0001;
@@ -99,7 +98,9 @@ pub struct SimpleExecutor {
 
 impl SimpleExecutor {
     pub fn new() -> Self {
-        Self { modules: Vec::new() }
+        Self {
+            modules: Vec::new(),
+        }
     }
 
     pub fn add_module(&mut self, module: Module) {

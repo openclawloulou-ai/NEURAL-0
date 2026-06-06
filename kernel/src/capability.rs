@@ -27,17 +27,26 @@ impl CapabilityTable {
     }
 
     /// Add a capability and return its ID
-    pub fn add_capability(&mut self, kind: u8, scope: String, flags: u8, 
-                         uses_remaining: Option<u32>, expires_at: Option<u64>) -> u32 {
+    pub fn add_capability(
+        &mut self,
+        kind: u8,
+        scope: String,
+        flags: u8,
+        uses_remaining: Option<u32>,
+        expires_at: Option<u64>,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
-        self.capabilities.insert(id, Capability {
-            kind,
-            scope,
-            flags,
-            uses_remaining,
-            expires_at,
-        });
+        self.capabilities.insert(
+            id,
+            Capability {
+                kind,
+                scope,
+                flags,
+                uses_remaining,
+                expires_at,
+            },
+        );
         id
     }
 

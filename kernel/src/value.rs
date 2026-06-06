@@ -28,8 +28,14 @@ impl Value {
                     return None;
                 }
                 let val = i64::from_be_bytes([
-                    bytes[offset], bytes[offset+1], bytes[offset+2], bytes[offset+3],
-                    bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7],
+                    bytes[offset],
+                    bytes[offset + 1],
+                    bytes[offset + 2],
+                    bytes[offset + 3],
+                    bytes[offset + 4],
+                    bytes[offset + 5],
+                    bytes[offset + 6],
+                    bytes[offset + 7],
                 ]);
                 offset += 8;
                 Value::I64(val)
@@ -39,8 +45,14 @@ impl Value {
                     return None;
                 }
                 let val = f64::from_be_bytes([
-                    bytes[offset], bytes[offset+1], bytes[offset+2], bytes[offset+3],
-                    bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7],
+                    bytes[offset],
+                    bytes[offset + 1],
+                    bytes[offset + 2],
+                    bytes[offset + 3],
+                    bytes[offset + 4],
+                    bytes[offset + 5],
+                    bytes[offset + 6],
+                    bytes[offset + 7],
                 ]);
                 offset += 8;
                 Value::F64(val)
@@ -49,12 +61,12 @@ impl Value {
                 if bytes.len() < 2 {
                     return None;
                 }
-                let len = u16::from_be_bytes([bytes[offset], bytes[offset+1]]) as usize;
+                let len = u16::from_be_bytes([bytes[offset], bytes[offset + 1]]) as usize;
                 offset += 2;
                 if bytes.len() < offset + len {
                     return None;
                 }
-                let val = bytes[offset..offset+len].to_vec();
+                let val = bytes[offset..offset + len].to_vec();
                 offset += len;
                 Value::Bytes(val)
             }
@@ -63,14 +75,15 @@ impl Value {
                     return None;
                 }
                 let val = u32::from_be_bytes([
-                    bytes[offset], bytes[offset+1], bytes[offset+2], bytes[offset+3],
+                    bytes[offset],
+                    bytes[offset + 1],
+                    bytes[offset + 2],
+                    bytes[offset + 3],
                 ]);
                 offset += 4;
                 Value::Ptr(val)
             }
-            0x05 => {
-                Value::Nil
-            }
+            0x05 => Value::Nil,
             _ => return None,
         };
         Some((value, offset))

@@ -12,8 +12,8 @@ pub enum Trap {
     TypeMismatch,
 
     // Memory errors
-    OOBMemory,      // Out of bounds memory access
-    OOM,            // Out of memory
+    OOBMemory, // Out of bounds memory access
+    OOM,       // Out of memory
     InvalidPointer,
 
     // Instruction errors
