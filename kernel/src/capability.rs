@@ -78,9 +78,9 @@ impl CapabilityTable {
 
     /// Check if capability has expired
     pub fn is_expired(&self, id: u32, current_time: u64) -> bool {
-        self.capabilities.get(&id).map_or(true, |cap| {
-            cap.expires_at.map_or(false, |exp| current_time >= exp)
-        })
+        self.capabilities
+            .get(&id)
+            .is_none_or(|cap| cap.expires_at.is_some_and(|exp| current_time >= exp))
     }
 
     /// Clear all capabilities

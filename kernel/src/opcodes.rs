@@ -132,13 +132,13 @@ impl OpCode {
 }
 
 // Instruction decoding helpers
-pub fn read_u16_be<'a>(bytes: &'a [u8], offset: &mut usize) -> u16 {
+pub fn read_u16_be(bytes: &[u8], offset: &mut usize) -> u16 {
     let value = u16::from_be_bytes([bytes[*offset], bytes[*offset + 1]]);
     *offset += 2;
     value
 }
 
-pub fn read_i32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> i32 {
+pub fn read_i32_be(bytes: &[u8], offset: &mut usize) -> i32 {
     let value = i32::from_be_bytes([
         bytes[*offset],
         bytes[*offset + 1],
@@ -149,7 +149,7 @@ pub fn read_i32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> i32 {
     value
 }
 
-pub fn read_u32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> u32 {
+pub fn read_u32_be(bytes: &[u8], offset: &mut usize) -> u32 {
     let value = u32::from_be_bytes([
         bytes[*offset],
         bytes[*offset + 1],
@@ -160,7 +160,7 @@ pub fn read_u32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> u32 {
     value
 }
 
-pub fn read_f32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> f32 {
+pub fn read_f32_be(bytes: &[u8], offset: &mut usize) -> f32 {
     let value = f32::from_be_bytes([
         bytes[*offset],
         bytes[*offset + 1],
@@ -171,7 +171,7 @@ pub fn read_f32_be<'a>(bytes: &'a [u8], offset: &mut usize) -> f32 {
     value
 }
 
-pub fn read_f64_be<'a>(bytes: &'a [u8], offset: &mut usize) -> f64 {
+pub fn read_f64_be(bytes: &[u8], offset: &mut usize) -> f64 {
     let value = f64::from_be_bytes([
         bytes[*offset],
         bytes[*offset + 1],
@@ -186,7 +186,7 @@ pub fn read_f64_be<'a>(bytes: &'a [u8], offset: &mut usize) -> f64 {
     value
 }
 
-pub fn read_i64_be<'a>(bytes: &'a [u8], offset: &mut usize) -> i64 {
+pub fn read_i64_be(bytes: &[u8], offset: &mut usize) -> i64 {
     let value = i64::from_be_bytes([
         bytes[*offset],
         bytes[*offset + 1],
@@ -201,7 +201,7 @@ pub fn read_i64_be<'a>(bytes: &'a [u8], offset: &mut usize) -> i64 {
     value
 }
 
-pub fn read_u8<'a>(bytes: &'a [u8], offset: &mut usize) -> u8 {
+pub fn read_u8(bytes: &[u8], offset: &mut usize) -> u8 {
     let value = bytes[*offset];
     *offset += 1;
     value

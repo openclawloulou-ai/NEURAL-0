@@ -68,12 +68,12 @@ impl SimpleAssembler {
         }
 
         // Check magic
-        if &binary[0..2] != &0x4E30u16.to_be_bytes() {
+        if binary[0..2] != 0x4E30u16.to_be_bytes() {
             return Err("Invalid magic number".to_string());
         }
 
         // Check version
-        if &binary[2..4] != &0x0001u16.to_be_bytes() {
+        if binary[2..4] != 0x0001u16.to_be_bytes() {
             return Err("Unsupported version".to_string());
         }
 

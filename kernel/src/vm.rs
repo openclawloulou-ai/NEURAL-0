@@ -60,7 +60,7 @@ impl VM {
         let opcode_val = read_u16_be(code, &mut (self.pc as usize));
         self.pc += 2; // Move past opcode
 
-        let opcode = OpCode::from_u16(opcode_val).ok_or_else(|| Trap::InvalidOpcode)?;
+        let opcode = OpCode::from_u16(opcode_val).ok_or(Trap::InvalidOpcode)?;
 
         // Execute the opcode
         match opcode {
@@ -368,14 +368,14 @@ impl VM {
     }
 
     fn op_jump(&mut self, code: &[u8]) -> Result<(), Trap> {
-        let offset = read_i32_be(code, &mut (self.pc as usize)) as i32;
+        let offset = read_i32_be(code, &mut (self.pc as usize));
         let target = self.pc.wrapping_add(offset as u32);
         self.pc = target;
         Ok(())
     }
 
     fn op_jump_if(&mut self, code: &[u8]) -> Result<(), Trap> {
-        let offset = read_i32_be(code, &mut (self.pc as usize)) as i32;
+        let offset = read_i32_be(code, &mut (self.pc as usize));
         let condition = self.stack.pop()?;
         if condition.is_true() {
             let target = self.pc.wrapping_add(offset as u32);
@@ -385,7 +385,7 @@ impl VM {
     }
 
     fn op_jump_if_not(&mut self, code: &[u8]) -> Result<(), Trap> {
-        let offset = read_i32_be(code, &mut (self.pc as usize)) as i32;
+        let offset = read_i32_be(code, &mut (self.pc as usize));
         let condition = self.stack.pop()?;
         if !condition.is_true() {
             let target = self.pc.wrapping_add(offset as u32);
@@ -498,7 +498,7 @@ impl VM {
 
     fn op_prob_b(&mut self, code: &[u8]) -> Result<(), Trap> {
         let threshold = read_f32_be(code, &mut (self.pc as usize));
-        let offset = read_i32_be(code, &mut (self.pc as usize)) as i32;
+        let offset = read_i32_be(code, &mut (self.pc as usize));
         let prob = self.stack.pop()?;
         let prob_f64 = prob.expect_f64()?;
         if prob_f64 > threshold as f64 {

@@ -117,3 +117,9 @@ impl SimpleExecutor {
         Ok(())
     }
 }
+
+impl Default for SimpleExecutor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
