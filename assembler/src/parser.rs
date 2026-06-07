@@ -140,7 +140,7 @@ impl<'a> Parser<'a> {
                     self.next(); // consume colon
                     // Labels are handled during code generation
                     // For parsing, we treat them as zero-width instructions
-                    continue;
+                    self.parse_instruction() // recursively parse the next instruction
                 } else {
                     // This is an instruction mnemonic
                     self.parse_mnemonic(&name)
