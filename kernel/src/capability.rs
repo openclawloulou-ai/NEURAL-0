@@ -1,4 +1,20 @@
 use std::collections::HashMap;
+use crate::vm::{Trap, Value};
+
+/// Host trait for capability-aware operations
+pub trait CapabilityHost {
+    /// Invoke a tool with a given payload
+    fn invoke_tool(&self, tool_id: u16, payload: &[u8]) -> Result<Value, Trap>;
+}
+
+/// No-op host implementation for testing
+pub struct NoOpHost;
+
+impl CapabilityHost for NoOpHost {
+    fn invoke_tool(&self, _tool_id: u16, _payload: &[u8]) -> Result<Value, Trap> {
+        Err(Trap::CapabilityDenied)
+    }
+}
 
 /// Capability table for managing access rights
 #[derive(Debug, Clone, Default)]
