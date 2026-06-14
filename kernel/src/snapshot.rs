@@ -47,43 +47,188 @@ impl Snapshot {
         }
     }
 
-    /// Serialize snapshot data to binary format
-    pub fn serialize(&self) -> Vec<u8> {
+    /// Serialize snapshot data to binary format with CRC32 checksum
+    pub fn serialize(data: &SnapshotData) -> Vec<u8> {
         let mut buffer = Vec::new();
 
         // Magic and version
-        buffer.extend_from_slice(&Self::MAGIC.to_be_bytes()); // 2 bytes
-        buffer.extend_from_slice(&Self::VERSION.to_be_bytes()); // 2 bytes
+        buffer.extend_from_slice(&Self::MAGIC.to_be_bytes());
+        buffer.extend_from_slice(&Self::VERSION.to_be_bytes());
 
-        // Note: For v1, we're simplifying the snapshot format significantly
-        // due to privacy restrictions in CapabilityTable
-        // A full implementation would serialize all the SnapshotData fields
+        // Timestamp (8 bytes)
+        buffer.extend_from_slice(&data.timestamp.to_be_bytes());
+        // Module ID (4 bytes)
+        buffer.extend_from_slice(&data.module_id.to_be_bytes());
+        // Program Counter (4 bytes)
+        buffer.extend_from_slice(&data.program_counter.to_be_bytes());
 
-        // For now, we'll just return a minimal valid snapshot
+        // Stack length and data
+        buffer.extend_from_slice(&(data.stack.len() as u32).to_be_bytes());
+        for val in &data.stack {
+            buffer.extend_from_slice(&val.to_be_bytes());
+        }
+
+        // Memory length and data
+        buffer.extend_from_slice(&(data.memory.len() as u32).to_be_bytes());
+        buffer.extend_from_slice(&data.memory);
+
+        // Capabilities length (simplified count for v1) and data
+        let cap_count = data.capabilities.len() as u32;
+        buffer.extend_from_slice(&cap_count.to_be_bytes());
+        // Serialize capabilities as raw bytes for v1
+        for i in 0..cap_count as usize {
+            if let Some(cap) = data.capabilities.get(i) {
+                buffer.extend_from_slice(&cap.to_be_bytes());
+            }
+        }
+
+        // Vector refs length and data
+        buffer.extend_from_slice(&(data.vector_refs.len() as u32).to_be_bytes());
+        for (hash, scope) in &data.vector_refs {
+            buffer.extend_from_slice(&hash.to_be_bytes());
+            let scope_bytes = scope.as_bytes();
+            buffer.extend_from_slice(&(scope_bytes.len() as u32).to_be_bytes());
+            buffer.extend_from_slice(scope_bytes);
+        }
+
+        // Calculate CRC32 of the payload so far
+        let crc = crc32fast::hash(&buffer);
+        buffer.extend_from_slice(&crc.to_be_bytes());
+
         buffer
     }
 
-    /// Deserialize binary data into snapshot
-    pub fn deserialize(_data: &[u8]) -> Result<SnapshotData, Trap> {
-        // For v1, we'll return an empty snapshot due to complexity
-        // A full implementation would parse the binary format
-        Ok(SnapshotData::default())
+    /// Deserialize binary data into snapshot, verifying CRC32 checksum
+    pub fn deserialize(data: &[u8]) -> Result<SnapshotData, Trap> {
+        if data.len() < 20 {
+            return Err(Trap::SnapshotError("Invalid snapshot size".to_string()));
+        }
+
+        // Verify CRC32 first
+        let payload_len = data.len() - 4;
+        let stored_crc = u32::from_be_bytes([
+            data[payload_len],
+            data[payload_len + 1],
+            data[payload_len + 2],
+            data[payload_len + 3],
+        ]);
+        let calculated_crc = crc32fast::hash(&data[..payload_len]);
+
+        if stored_crc != calculated_crc {
+            return Err(Trap::SnapshotError("ChecksumMismatch".to_string()));
+        }
+
+        let mut offset = 0;
+
+        // Magic
+        let magic = u16::from_be_bytes([data[offset], data[offset + 1]]);
+        offset += 2;
+        if magic != Self::MAGIC {
+            return Err(Trap::SnapshotError("Invalid magic number".to_string()));
+        }
+
+        // Version
+        let version = u16::from_be_bytes([data[offset], data[offset + 1]]);
+        offset += 2;
+        if version != Self::VERSION {
+            return Err(Trap::SnapshotError("Unsupported version".to_string()));
+        }
+
+        // Timestamp
+        let timestamp = u64::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+            data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7],
+        ]);
+        offset += 8;
+
+        // Module ID
+        let module_id = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]);
+        offset += 4;
+
+        // Program Counter
+        let program_counter = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]);
+        offset += 4;
+
+        // Stack
+        let stack_len = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]) as usize;
+        offset += 4;
+        let mut stack = Vec::with_capacity(stack_len);
+        for _ in 0..stack_len {
+            let val = Value::from_be_bytes([
+                data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+                data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7],
+            ]);
+            offset += 8;
+            stack.push(val);
+        }
+
+        // Memory
+        let mem_len = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]) as usize;
+        offset += 4;
+        let memory = data[offset..offset + mem_len].to_vec();
+        offset += mem_len;
+
+        // Capabilities
+        let cap_count = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]) as usize;
+        offset += 4;
+        let mut capabilities = CapabilityTable::new();
+        for _ in 0..cap_count {
+            let cap = u64::from_be_bytes([
+                data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+                data[offset + 4], data[offset + 5], data[offset + 6], data[offset + 7],
+            ]);
+            offset += 8;
+            capabilities.push(cap);
+        }
+
+        // Vector refs
+        let ref_count = u32::from_be_bytes([
+            data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+        ]) as usize;
+        offset += 4;
+        let mut vector_refs = Vec::with_capacity(ref_count);
+        for _ in 0..ref_count {
+            let hash = u32::from_be_bytes([
+                data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+            ]);
+            offset += 4;
+            let scope_len = u32::from_be_bytes([
+                data[offset], data[offset + 1], data[offset + 2], data[offset + 3],
+            ]) as usize;
+            offset += 4;
+            let scope = String::from_utf8(data[offset..offset + scope_len].to_vec())
+                .map_err(|_| Trap::SnapshotError("Invalid UTF-8 in scope".to_string()))?;
+            offset += scope_len;
+            vector_refs.push((hash, scope));
+        }
+
+        Ok(SnapshotData {
+            timestamp,
+            module_id,
+            program_counter,
+            stack,
+            memory,
+            capabilities,
+            vector_refs,
+        })
     }
 
     /// Apply snapshot data to VM state
     pub fn apply_to(
-        &self,
+        data: &SnapshotData,
         stack: &mut Stack,
         memory: &mut Memory,
-        _capabilities: &mut CapabilityTable,
+        capabilities: &mut CapabilityTable,
     ) -> Result<(), Trap> {
-        // Apply stack - simplified for v1, just clear and leave empty
-        stack.clear();
-
-        // Apply memory - simplified for v1, just clear and leave empty
-        memory.clear();
-
-        // Note: Full restoration skipped for v1 due to complexity
-        Ok(())
-    }
+        stack.load(&data.stack);
 }
