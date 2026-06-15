@@ -11,6 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 neural0_assembler = { path = "../assembler" }
+crc32fast = "1.4"
 
 [dev-dependencies]
 # For testing
