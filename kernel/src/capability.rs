@@ -13,7 +13,7 @@ pub struct NoOpHost;
 
 impl CapabilityHost for NoOpHost {
     fn invoke_tool(&self, _tool_id: u16, _payload: &[u8]) -> Result<Value, Trap> {
-        Err(Trap::CapabilityDenied)
+        Err(Trap::MissingCap)
     }
 }
 
