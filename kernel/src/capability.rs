@@ -1,4 +1,5 @@
-use crate::vm::{Trap, Value};
+use crate::trap::Trap;
+use crate::value::Value;
 use std::collections::HashMap;
 
 /// Host trait for capability-aware operations
