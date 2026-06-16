@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use crate::vm::{Trap, Value};
+use std::collections::HashMap;
 
 /// Host trait for capability-aware operations
 pub trait CapabilityHost {
